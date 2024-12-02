@@ -336,8 +336,8 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     Arguments.PushNumber(fHealthLoss);
                     pSourcePlayer->CallEvent("onPlayerDamage", Arguments);
                 }
+                pSourcePlayer->SetHealth(fHealth);
             }
-            pSourcePlayer->SetHealth(fHealth);
 
             // Armor
             SPlayerArmorSync armor;

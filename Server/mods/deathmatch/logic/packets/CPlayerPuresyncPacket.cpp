@@ -280,11 +280,12 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         float fOldHealth = pSourcePlayer->GetHealth();
         float fHealthLoss = fOldHealth - fHealth;
-        pSourcePlayer->SetHealth(fHealth);
 
         // Less than last packet's frame?
         if (fHealthLoss > 0 || fArmorLoss > 0)
         {
+            pSourcePlayer->SetHealth(fHealth);
+
             float fDamage = 0.0f;
             if (fHealthLoss > 0)
                 fDamage += fHealthLoss;
