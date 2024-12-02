@@ -171,7 +171,7 @@ public:
     bool           HasWeaponType(unsigned char ucWeaponType);
 
     float GetMaxHealth() { return m_fMaxHealth; }
-    float SetMaxHealth(float fMaxHealth) { m_fMaxHealth = fMaxHealth; }
+    void  SetMaxHealth(float fMaxHealth) { m_fMaxHealth = fMaxHealth; }
     float GetHealth() { return m_fHealth; }
     void  SetHealth(float fHealth) { m_fHealth = fHealth; }
     float GetArmor() { return m_fArmor; }
