@@ -56,6 +56,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementColShape", getElementColShape},
         {"getElementAlpha", getElementAlpha},
         {"isElementDoubleSided", isElementDoubleSided},
+        {"getElementMaxHealth", getElementMaxHealth},
         {"getElementHealth", getElementHealth},
         {"getElementModel", getElementModel},
         {"getElementSyncer", getElementSyncer},

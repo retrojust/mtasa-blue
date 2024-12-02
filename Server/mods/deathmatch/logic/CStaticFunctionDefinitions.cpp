@@ -1682,7 +1682,7 @@ bool CStaticFunctionDefinitions::SetElementMaxHealth(CElement* pElement, float f
             pPed->SetMaxHealth(fMaxHealth);
 
             if (pPed->IsSpawned() && pPed->GetHealth() > fMaxHealth)
-                pPed->SetHealth(fMaxHealth);
+                CStaticFunctionDefinitions::SetElementHealth(pElement, fMaxHealth);
 
             break;
         }
