@@ -96,6 +96,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementDimension", setElementDimension},
         {"setElementAlpha", setElementAlpha},
         {"setElementDoubleSided", setElementDoubleSided},
+        {"setElementMaxHealth", setElementMaxHealth},
         {"setElementHealth", setElementHealth},
         {"setElementModel", setElementModel},
         {"setElementSyncer", setElementSyncer},
@@ -133,6 +134,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setParent", "setElementParent");
     lua_classfunction(luaVM, "setFrozen", "setElementFrozen");
     lua_classfunction(luaVM, "setHealth", "setElementHealth");
+    lua_classfunction(luaVM, "setMaxHealth", "setElementMaxHealth");
     lua_classfunction(luaVM, "setModel", "setElementModel");
     lua_classfunction(luaVM, "setSyncer", "setElementSyncer");
     lua_classfunction(luaVM, "setAlpha", "setElementAlpha");
@@ -163,6 +165,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getID", "getElementID");
     lua_classfunction(luaVM, "getZoneName", "getElementZoneName");
     lua_classfunction(luaVM, "getAlpha", "getElementAlpha");
+    lua_classfunction(luaVM, "getMaxHealth", "getElementMaxHealth");
     lua_classfunction(luaVM, "getHealth", "getElementHealth");
     lua_classfunction(luaVM, "getModel", "getElementModel");
     lua_classfunction(luaVM, "getChildrenCount", "getElementChildrenCount");
@@ -200,6 +203,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "attachedElements", NULL, "getAttachedElements");
     lua_classvariable(luaVM, "inWater", NULL, "isElementInWater");
     lua_classvariable(luaVM, "health", "setElementHealth", "getElementHealth");
+    lua_classvariable(luaVM, "maxHealth", "setElementMaxHealth", "getElementMaxHealth");
     lua_classvariable(luaVM, "alpha", "setElementAlpha", "getElementAlpha");
     lua_classvariable(luaVM, "type", NULL, "getElementType");
     lua_classvariable(luaVM, "dimension", "setElementDimension", "getElementDimension");
@@ -1330,6 +1334,30 @@ int CLuaElementDefs::getElementHealth(lua_State* luaVM)
     return 1;
 }
 
+int CLuaElementDefs::getElementMaxHealth(lua_State* luaVM)
+{
+    //  float getElementHealth ( element theElement )
+    CElement* pElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        float fMaxHealth;
+        if (CStaticFunctionDefinitions::GetElementMaxHealth(pElement, fMaxHealth))
+        {
+            lua_pushnumber(luaVM, fMaxHealth);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaElementDefs::getElementModel(lua_State* luaVM)
 {
     //  int getElementModel ( element theElement )
@@ -2172,6 +2200,32 @@ int CLuaElementDefs::setElementDoubleSided(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (CStaticFunctionDefinitions::SetElementDoubleSided(pElement, bDoubleSided))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::setElementMaxHealth(lua_State* luaVM)
+{
+    //  bool setElementMaxHealth ( element theElement, float newHealth )
+    CElement*        pElement = NULL;
+    float            fMaxHealth = 0.0f;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadNumber(fMaxHealth);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (CStaticFunctionDefinitions::SetElementMaxHealth(pElement, fMaxHealth))
         {
             lua_pushboolean(luaVM, true);
             return 1;

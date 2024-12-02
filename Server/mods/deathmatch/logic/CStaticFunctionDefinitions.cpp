@@ -644,6 +644,26 @@ bool CStaticFunctionDefinitions::IsElementDoubleSided(CElement* pElement, bool& 
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetElementMaxHealth(CElement* pElement, float& fMaxHealth)
+{
+    assert(pElement);
+
+    switch (pElement->GetType())
+    {
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            CPed* pPed = static_cast<CPed*>(pElement);
+            fMaxHealth = pPed->GetMaxHealth();
+            break;
+        }
+        default:
+            return false;
+    }
+
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetElementHealth(CElement* pElement, float& fHealth)
 {
     assert(pElement);
@@ -1644,6 +1664,31 @@ bool CStaticFunctionDefinitions::SetElementDoubleSided(CElement* pElement, bool 
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit(bDoubleSided);
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DOUBLESIDED, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementMaxHealth(CElement* pElement, float fMaxHealth)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetElementHealth(*iter, fMaxHealth))
+
+    switch (pElement->GetType())
+    {
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            CPed* pPed = static_cast<CPed*>(pElement);
+            pPed->SetMaxHealth(fMaxHealth);
+
+            if (pPed->IsSpawned() && pPed->GetHealth() > fMaxHealth)
+                pPed->SetHealth(fMaxHealth);
+
+            break;
+        }
+        default:
+            return false;
+    }
 
     return true;
 }

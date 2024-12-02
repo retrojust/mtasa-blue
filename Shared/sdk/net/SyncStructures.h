@@ -178,10 +178,10 @@ struct SFloatAsBitsSync : public SFloatAsBitsSyncBase
 };
 
 // Declare specific health and armor sync structures
-struct SPlayerHealthSync : public SFloatAsBitsSync<8>
+struct SPlayerHealthSync : public SFloatAsBitsSync<11>
 {
-    // 0 - 200 step 1                                 255 = ( 2^8 - 1 ) * 1
-    SPlayerHealthSync() : SFloatAsBitsSync<8>(0.f, 255.0f, true, false) {}
+    // 0 - 1000 step 0.5                               1023.5 = ( 2^11 - 1 ) * 0.5
+    SPlayerHealthSync() : SFloatAsBitsSync<11>(0.f, 1023.5f, true, false) {}
 };
 
 struct SPlayerArmorSync : public SFloatAsBitsSync<8>

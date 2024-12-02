@@ -53,6 +53,7 @@ public:
     LUA_DECLARE(getElementColShape);
     LUA_DECLARE(getElementAlpha);
     LUA_DECLARE(isElementDoubleSided);
+    LUA_DECLARE(getElementMaxHealth);
     LUA_DECLARE(getElementHealth);
     LUA_DECLARE(getElementModel);
     LUA_DECLARE(isElementInWater);
@@ -99,6 +100,7 @@ public:
     LUA_DECLARE(setElementDimension);
     LUA_DECLARE(setElementAlpha);
     LUA_DECLARE(setElementDoubleSided);
+    LUA_DECLARE(setElementMaxHealth);
     LUA_DECLARE(setElementHealth);
     LUA_DECLARE(setElementModel);
     LUA_DECLARE(setElementSyncer);

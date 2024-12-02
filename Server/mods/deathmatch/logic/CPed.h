@@ -170,7 +170,8 @@ public:
     void           SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot = 0xFF);
     bool           HasWeaponType(unsigned char ucWeaponType);
 
-    float GetMaxHealth();
+    float GetMaxHealth() { return m_fMaxHealth; }
+    float SetMaxHealth(float fMaxHealth) { m_fMaxHealth = fMaxHealth; }
     float GetHealth() { return m_fHealth; }
     void  SetHealth(float fHealth) { m_fHealth = fHealth; }
     float GetArmor() { return m_fArmor; }
@@ -289,6 +290,7 @@ protected:
     bool                                 m_bWearingGoggles;
     bool                                 m_bIsOnFire;
     float                                m_fHealth;
+    float                                m_fMaxHealth = 100;
     float                                m_fArmor;
     SFixedArray<float, NUM_PLAYER_STATS> m_fStats;
     CPlayerClothes*                      m_pClothes;
