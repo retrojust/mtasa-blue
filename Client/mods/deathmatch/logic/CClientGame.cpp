@@ -2648,6 +2648,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientPlayerStuntStart", "type", NULL, false);
     m_Events.AddEvent("onClientPlayerStuntFinish", "type, time, distance", NULL, false);
     m_Events.AddEvent("onClientPlayerRadioSwitch", "", NULL, false);
+    m_Events.AddEvent("onClientPlayerPreDamage", "attacker, weapon, bodypart", NULL, false);
     m_Events.AddEvent("onClientPlayerDamage", "attacker, weapon, bodypart", NULL, false);
     m_Events.AddEvent("onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false);
     m_Events.AddEvent("onClientPlayerWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
@@ -4374,7 +4375,31 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
     float fPreviousArmor = pDamagedPed->m_armor;
     float fCurrentArmor = pDamagedPed->GetGamePlayer()->GetArmor();
 
-    // Have we taken any damage here?
+    // pass 1 - preApplyDamage (only for localPlayer)
+    if (fPreviousHealth == fCurrentHealth && fPreviousArmor == fCurrentArmor && fDamage == 0.0f && pDamagedPed->IsLocalPlayer())
+    {
+        CLuaArguments Arguments;
+        if (pInflictingEntity)
+            Arguments.PushElement(pInflictingEntity);
+        else
+            Arguments.PushBoolean(false);
+        Arguments.PushNumber(static_cast<unsigned char>(weaponUsed));
+        Arguments.PushNumber(static_cast<unsigned char>(hitZone));
+
+        // Call our event
+        if (!pDamagedPed->CallEvent("onClientPlayerPreDamage", Arguments, true))
+        {
+            // Stop here if they cancelEvent it
+            // Reget values in case they have been changed during onClientPlayerPreDamage event (Avoid AC#1 kick)
+            fPreviousHealth = pDamagedPed->m_fHealth;
+            fPreviousArmor = pDamagedPed->m_armor;
+            pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
+            pDamagedPed->GetGamePlayer()->SetArmor(fPreviousArmor);
+            return false;
+        }
+    }
+    // pass 2 - postApplyDamage/preApplyAnim
+    else
     if ((fPreviousHealth != fCurrentHealth || fPreviousArmor != fCurrentArmor) && fDamage != 0.0f)
     {
         ///////////////////////////////////////////////////////////////////////////
