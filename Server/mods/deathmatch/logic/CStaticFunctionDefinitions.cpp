@@ -362,9 +362,12 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
     }  
 
     // Tell everyone to destroy it
-    CEntityRemovePacket Packet;
-    Packet.Add(pElement);
-    m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    if (!pElement->IsServersideOnly())
+    {
+        CEntityRemovePacket Packet;
+        Packet.Add(pElement);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    }
 
     // Delete it
     m_pElementDeleter->Delete(pElement);
@@ -932,6 +935,33 @@ bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled(CElement* pEle
             CBitStream BitStream;
             BitStream.pBitStream->Write(bEnable);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_PROPAGATE_CALLS_ENABLED, *BitStream.pBitStream));
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::IsElementServersideOnly(CElement* pElement, bool& bOutEnabled)
+{
+    bOutEnabled = pElement->IsServersideOnly();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementServersideOnly(CElement* pElement, bool bEnable)
+{
+    if (bEnable != pElement->IsServersideOnly())
+    {
+        // Disallow being set on root
+        if (pElement != GetRootElement())
+        {
+            pElement->SetServersideOnly(bEnable);
+
+            if (!pElement->IsServersideOnly())
+            {
+                CEntityAddPacket Packet;
+                Packet.Add(pElement);
+                m_pPlayerManager->BroadcastOnlyJoined(Packet);
+            }
             return true;
         }
     }
@@ -4923,7 +4953,7 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo(CElement* pElement, unsigned char
 }
 
 CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
-                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, bool bSynced)
+                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, bool bSynced, bool bServersideOnly)
 {
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
@@ -4943,12 +4973,13 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
         pVehicle->SetRespawnPosition(vecPosition);
         pVehicle->SetRespawnRotationDegrees(vecRotation);
         pVehicle->SetUnoccupiedSyncable(bSynced);
+        pVehicle->SetServersideOnly(bServersideOnly);
 
         if (szRegPlate && szRegPlate[0])
             pVehicle->SetRegPlate(szRegPlate);
 
         // Only sync if the resource has started on client
-        if (pResource->IsClientSynced())
+        if (pResource->IsClientSynced() && !bServersideOnly)
         {
             CEntityAddPacket Packet;
             Packet.Add(pVehicle);

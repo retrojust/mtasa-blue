@@ -58,7 +58,7 @@ void SilentlyFixIndeterminate(CVector2D& vecValue)
 void CEntityAddPacket::Add(CElement* pElement)
 {
     // Only add it if it has a parent.
-    if (pElement->GetParentEntity())
+    if (pElement->GetParentEntity() && !pElement->IsServersideOnly())
     {
         // Jax: adding some checks here because map/element loading is all over the fucking place!
         switch (pElement->GetType())

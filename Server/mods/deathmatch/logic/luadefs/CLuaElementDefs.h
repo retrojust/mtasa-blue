@@ -62,6 +62,7 @@ public:
     LUA_DECLARE(getLowLODElement);
     LUA_DECLARE(isElementLowLOD);
     LUA_DECLARE(isElementCallPropagationEnabled);
+    LUA_DECLARE(isElementServersideOnly);
 
     // Visible to
     LUA_DECLARE(clearElementVisibleTo);
@@ -107,5 +108,6 @@ public:
     LUA_DECLARE(setElementFrozen);
     LUA_DECLARE(setLowLODElement);
     LUA_DECLARE(setElementCallPropagationEnabled);
+    LUA_DECLARE(setElementServersideOnly);
     static bool SetElementOnFire(CElement* element, bool onFire) noexcept;
 };

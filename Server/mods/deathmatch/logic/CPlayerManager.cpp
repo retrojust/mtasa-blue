@@ -14,6 +14,7 @@
 #include "packets/CPlayerDisconnectedPacket.h"
 #include "CGame.h"
 #include "net/SimHeaders.h"
+#include "packets/CElementRPCPacket.h"
 
 CPlayerManager::CPlayerManager()
 {
@@ -224,6 +225,9 @@ size_t CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* 
 static void DoBroadcast(const CPacket& Packet, const std::multimap<ushort, CPlayer*>& groupMap)
 {
     if (!CNetBufferWatchDog::CanSendPacket(Packet.GetPacketID()))
+        return;
+
+    if (Packet.GetPacketID() == PACKET_ID_LUA_ELEMENT_RPC && Packet.GetSourceElement()->IsServersideOnly())
         return;
 
     // Use the flags to determine how to send it

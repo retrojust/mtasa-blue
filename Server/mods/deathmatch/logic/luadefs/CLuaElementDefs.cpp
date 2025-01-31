@@ -33,6 +33,8 @@ void CLuaElementDefs::LoadFunctions()
         {"isElementLowLOD", isElementLowLOD},
         {"setElementCallPropagationEnabled", setElementCallPropagationEnabled},
         {"isElementCallPropagationEnabled", isElementCallPropagationEnabled},
+        {"setElementServersideOnly", setElementServersideOnly},
+        {"isElementServersideOnly", isElementServersideOnly},
 
         {"getElementByID", getElementByID},
         {"getElementByIndex", getElementByIndex},
@@ -153,6 +155,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setLowLOD", "setLowLODElement");
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
+    lua_classfunction(luaVM, "setServersideOnly", "setElementServersideOnly");
     lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
 
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
@@ -184,6 +187,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getCollisionsEnabled", "getElementCollisionsEnabled");
     lua_classfunction(luaVM, "isCallPropagationEnabled", "isElementCallPropagationEnabled");
+    lua_classfunction(luaVM, "isServersideOnly", "isElementServersideOnly");
     lua_classfunction(luaVM, "isWithinMarker", "isElementWithinMarker");
     lua_classfunction(luaVM, "isWithinColShape", "isElementWithinColShape");
     lua_classfunction(luaVM, "isFrozen", "isElementFrozen");
@@ -196,6 +200,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "id", "setElementID", "getElementID");
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
+    lua_classvariable(luaVM, "serversideOnly", "setElementServersideOnly", "isElementServersideOnly");
     lua_classvariable(luaVM, "parent", "setElementParent", "getElementParent");
     lua_classvariable(luaVM, "zoneName", NULL, "getElementZoneName");
     lua_classvariable(luaVM, "attachedTo", "attachElements", "getElementAttachedTo");
@@ -2439,6 +2444,57 @@ int CLuaElementDefs::isElementCallPropagationEnabled(lua_State* luaVM)
     {
         bool bEnabled;
         if (CStaticFunctionDefinitions::IsElementCallPropagationEnabled(pEntity, bEnabled))
+        {
+            lua_pushboolean(luaVM, bEnabled);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::setElementServersideOnly(lua_State* luaVM)
+{
+    //  bool setElementServersideOnly ( element theElement, bool enable )
+    CElement* pEntity;
+    bool      bEnable;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadBool(bEnable);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pEntity);
+
+        if (CStaticFunctionDefinitions::SetElementServersideOnly(pEntity, bEnable))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::isElementServersideOnly(lua_State* luaVM)
+{
+    //  bool isElementServersideOnly ( element theElement )
+    CElement* pEntity;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+
+    if (!argStream.HasErrors())
+    {
+        bool bEnabled;
+        if (CStaticFunctionDefinitions::IsElementServersideOnly(pEntity, bEnabled))
         {
             lua_pushboolean(luaVM, bEnabled);
             return 1;

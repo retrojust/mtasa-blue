@@ -236,6 +236,9 @@ public:
     bool IsCallPropagationEnabled() { return m_bCallPropagationEnabled; }
     void SetCallPropagationEnabled(bool bEnabled) { m_bCallPropagationEnabled = bEnabled; }
 
+    bool IsServersideOnly() { return m_bServersideOnly; }
+    void SetServersideOnly(bool bEnabled) { m_bServersideOnly = bEnabled; }
+
     bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
@@ -287,6 +290,7 @@ protected:
     bool                   m_bDoubleSided;
     bool                   m_bUpdatingSpatialData;
     bool                   m_bCallPropagationEnabled;
+    bool                   m_bServersideOnly = false;
     bool                   m_canBeDestroyedByScript = true;            // If true, destroyElement function will
                                                                        // have no effect on this element
     // Optimization for getElementsByType starting at root
