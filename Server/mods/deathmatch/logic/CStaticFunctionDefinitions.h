@@ -79,6 +79,7 @@ public:
     static bool           GetLowLodElement(CElement* pElement, CElement*& pOutLowLodElement);
     static bool           IsElementLowLod(CElement* pElement, bool& bOutLowLod);
     static bool           IsElementCallPropagationEnabled(CElement* pElement, bool& bOutEnabled);
+    static bool           IsElementSyncEnabled(CElement* pElement, bool& bOutEnabled);
 
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
@@ -111,6 +112,8 @@ public:
     static bool SetLowLodElement(CElement* pElement, CElement* pLowLodElement);
     static bool SetElementCallPropagationEnabled(CElement* pElement, bool bEnable);
     static bool SetElementOnFire(CElement* pElement, bool onFire);
+    static bool SetElementSyncEnabled(CElement* pElement, bool bEnable);
+    static bool SyncElementToPlayer(CElement* pElement, CPlayer* pPlayer);
 
     // Player get funcs
     static unsigned int       GetPlayerCount();
@@ -242,7 +245,7 @@ public:
 
     // Vehicle create/destroy functions
     static CVehicle* CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate,
-                                   unsigned char ucVariant, unsigned char ucVariant2, bool bSynced);
+                                   unsigned char ucVariant, unsigned char ucVariant2, bool bSynced, bool bSyncEnabled);
     static bool SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::uint8_t collisionType, std::int32_t removalTime = -1);
 
     // Vehicle get functions

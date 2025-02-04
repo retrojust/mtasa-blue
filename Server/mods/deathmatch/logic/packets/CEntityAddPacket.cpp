@@ -55,10 +55,10 @@ void SilentlyFixIndeterminate(CVector2D& vecValue)
     SilentlyFixIndeterminate(vecValue.fY);
 }
 
-void CEntityAddPacket::Add(CElement* pElement)
+void CEntityAddPacket::Add(CElement* pElement, bool bForceSync)
 {
     // Only add it if it has a parent.
-    if (pElement->GetParentEntity())
+    if (pElement->GetParentEntity() && (pElement->IsSyncEnabled() || bForceSync))
     {
         // Jax: adding some checks here because map/element loading is all over the fucking place!
         switch (pElement->GetType())

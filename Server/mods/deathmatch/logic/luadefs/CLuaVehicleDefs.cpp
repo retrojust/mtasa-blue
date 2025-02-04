@@ -301,8 +301,13 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
     uchar   ucVariant;
     uchar   ucVariant2;
     bool    bSynced;
+    bool    bSyncEnabled;
 
     CScriptArgReader argStream(luaVM);
+    if (argStream.NextIsBool())
+    {
+        argStream.ReadBool(bSyncEnabled, true);
+    }
     argStream.ReadNumber(usModel);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadVector3D(vecRotation, CVector());
@@ -328,7 +333,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
                 {
                     // Create the vehicle and return its handle
                     CVehicle* pVehicle =
-                        CStaticFunctionDefinitions::CreateVehicle(pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2, bSynced);
+                        CStaticFunctionDefinitions::CreateVehicle(pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2, bSynced, bSyncEnabled);
                     if (pVehicle)
                     {
                         CElementGroup* pGroup = pResource->GetElementGroup();

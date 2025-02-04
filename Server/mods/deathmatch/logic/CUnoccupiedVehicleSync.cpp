@@ -100,7 +100,7 @@ void CUnoccupiedVehicleSync::UpdateVehicle(CVehicle* pVehicle)
     CPed*    pController = pVehicle->GetController();
 
     // Handle no syncing when not occupied
-    if (!pVehicle->IsUnoccupiedSyncable())
+    if (!pVehicle->IsUnoccupiedSyncable() || !pVehicle->IsSyncEnabled())
     {
         // This vehicle got a syncer?
         if (pSyncer)
@@ -161,7 +161,7 @@ void CUnoccupiedVehicleSync::ResyncForPlayer(CPlayer* pPlayer)
 {
     for (CVehicle* vehicle : m_pVehicleManager->GetVehicles())
     {
-        if (vehicle->GetDimension() == pPlayer->GetDimension() && !vehicle->GetFirstOccupant() && vehicle->IsUnoccupiedSyncable())
+        if (vehicle->GetDimension() == pPlayer->GetDimension() && !vehicle->GetFirstOccupant() && vehicle->IsUnoccupiedSyncable() && vehicle->IsSyncEnabled())
         {
             pPlayer->Send(CVehicleResyncPacket(vehicle));
         }
@@ -193,7 +193,7 @@ void CUnoccupiedVehicleSync::FindSyncer(CVehicle* pVehicle)
 
 void CUnoccupiedVehicleSync::StartSync(CPlayer* pPlayer, CVehicle* pVehicle)
 {
-    if (!pVehicle->IsUnoccupiedSyncable())
+    if (!pVehicle->IsUnoccupiedSyncable() || !pVehicle->IsSyncEnabled())
         return;
 
     // Tell the player

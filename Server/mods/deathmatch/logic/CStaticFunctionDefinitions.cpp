@@ -362,9 +362,12 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
     }  
 
     // Tell everyone to destroy it
-    CEntityRemovePacket Packet;
-    Packet.Add(pElement);
-    m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    if (pElement->IsSyncEnabled())
+    {
+        CEntityRemovePacket Packet;
+        Packet.Add(pElement);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    }
 
     // Delete it
     m_pElementDeleter->Delete(pElement);
@@ -936,6 +939,45 @@ bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled(CElement* pEle
         }
     }
     return false;
+}
+
+bool CStaticFunctionDefinitions::IsElementSyncEnabled(CElement* pElement, bool& bOutEnabled)
+{
+    bOutEnabled = pElement->IsSyncEnabled();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementSyncEnabled(CElement* pElement, bool bEnable)
+{
+    if (bEnable != pElement->IsSyncEnabled())
+    {
+        // Disallow being set on root
+        if (pElement != GetRootElement())
+        {
+            pElement->SetSyncEnabled(bEnable);
+
+            if (bEnable)
+            {
+                CEntityAddPacket Packet;
+                Packet.Add(pElement);
+                m_pPlayerManager->BroadcastOnlyJoined(Packet);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SyncElementToPlayer(CElement* pElement, CPlayer* pPlayer)
+{
+    assert(pElement);
+    assert(pPlayer);
+
+    CEntityAddPacket Packet;
+    Packet.Add(pElement, true);
+    pPlayer->Send(Packet);
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetElementOnFire(CElement* pElement, bool onFire)
@@ -4923,7 +4965,7 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo(CElement* pElement, unsigned char
 }
 
 CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
-                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, bool bSynced)
+                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, bool bSynced, bool bSyncEnabled)
 {
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
@@ -4943,12 +4985,13 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
         pVehicle->SetRespawnPosition(vecPosition);
         pVehicle->SetRespawnRotationDegrees(vecRotation);
         pVehicle->SetUnoccupiedSyncable(bSynced);
+        pVehicle->SetSyncEnabled(bSyncEnabled);
 
         if (szRegPlate && szRegPlate[0])
             pVehicle->SetRegPlate(szRegPlate);
 
         // Only sync if the resource has started on client
-        if (pResource->IsClientSynced())
+        if (pResource->IsClientSynced() && bSyncEnabled)
         {
             CEntityAddPacket Packet;
             Packet.Add(pVehicle);

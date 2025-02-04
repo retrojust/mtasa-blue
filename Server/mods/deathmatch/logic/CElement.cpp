@@ -42,6 +42,7 @@ CElement::CElement(CElement* pParent)
     m_pParent = pParent;
     m_pElementGroup = NULL;
     m_bCallPropagationEnabled = true;
+    m_bSyncEnabled = true;
 
     m_iType = CElement::UNKNOWN;
     m_strName = "";

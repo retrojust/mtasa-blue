@@ -22,7 +22,7 @@ public:
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    void Add(class CElement* pElement);
+    void Add(class CElement* pElement, bool bForceSync = false);
     void Clear() { m_Entities.clear(); };
 
 private:
